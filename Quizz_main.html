@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill-in-the-Blanks Quiz</title>
+    <style>
+        /* CSS Styling */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #e0f7fa;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 700px;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .input {
+            width: 50px;
+            padding: 5px;
+            margin: 0 4px;
+            text-align: center;
+            border: 1px solid #00796b;
+            border-radius: 4px;
+            outline: none;
+        }
+        .input:focus {
+            border-color: #004d40;
+        }
+        button {
+            background-color: #00796b;
+            color: #ffffff;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+        .score, .answers {
+            font-size: 1.1em;
+            margin-top: 20px;
+            color: #00796b;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Fill-in-the-Blanks Quiz</h1>
+        <div id="question-container"></div>
+        <button onclick="submitAnswers()">Submit Answer</button>
+        <div id="score" class="score hidden"></div>
+        <div id="answers" class="answers hidden"></div>
+    </div>
+
+    <script>
+        // JavaScript
+        const questions = [
+            {
+                text: "In a qu____ coastal town known for its marit___ his____, a group of high sch___ students embarked o_ a project to restore a historic sailing ship. The ship, known as the Sea Serp___, w__ once a significant part of the town's her_____ and had been neglected at the dock.",
+                answers: ["iet", "ime", "tory", "ool", "n", "ent", "as", "itage"]
+            },
+            {
+                text: "During the ann___ science fair, a young girl presented her new inv_____, a robotic hand that could mimic human movements. It was a groundbreaking pr_____, impressing the judges and the audience with its precision and intric_____.",
+                answers: ["ual", "ention", "oject", "acy"]
+            },
+            // Additional questions omitted for brevity
+        ];
+
+        let currentQuestionIndex = -1;
+
+        function getRandomQuestion() {
+            if (questions.length === 0) {
+                document.getElementById('question-container').innerHTML = "<h3>You've completed all the questions!</h3>";
+                document.getElementById('score').classList.add('hidden');
+                return null;
+            }
+            currentQuestionIndex = Math.floor(Math.random() * questions.length);
+            return questions[currentQuestionIndex];
+        }
+
+        function renderQuestion() {
+            const question = getRandomQuestion();
+            if (!question) return;
+
+            const container = document.getElementById('question-container');
+            container.innerHTML = '';
+            let html = `<div class="question">`;
+            let splitText = question.text.split(" ");
+            let answerIndex = 0;
+
+            splitText.forEach(word => {
+                if (word.includes("____")) {
+                    html += `<input type="text" class="input" maxlength="4" data-index="${answerIndex}"> `;
+                    answerIndex++;
+                } else {
+                    html += `${word} `;
+                }
+            });
+
+            html += "</div>";
+            container.innerHTML = html;
+            document.getElementById('score').classList.add('hidden');
+            document.getElementById('answers').classList.add('hidden');
+        }
+
+        function submitAnswers() {
+            const question = questions[currentQuestionIndex];
+            const answersDiv = document.getElementById('answers');
+            let score = 0;
+            let total = question.answers.length;
+            let answerHTML = "Correct Answers: ";
+
+            question.answers.forEach((answer, i) => {
+                const input = document.querySelector(`input[data-index="${i}"]`);
+                if (input && input.value.toLowerCase() === answer.toLowerCase()) {
+                    score++;
+                }
+                answerHTML += `<b>${answer}</b> `;
+            });
+
+            const scoreDiv = document.getElementById('score');
+            scoreDiv.innerHTML = `You scored ${score} out of ${total} for this passage!`;
+            scoreDiv.classList.remove('hidden');
+
+            answersDiv.innerHTML = answerHTML;
+            answersDiv.classList.remove('hidden');
+
+            questions.splice(currentQuestionIndex, 1);  // Remove the completed question
+            setTimeout(renderQuestion, 2000); // Display next question after 2 seconds
+        }
+
+        renderQuestion(); // Load the first question
+    </script>
+</body>
+</html>
